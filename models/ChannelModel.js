@@ -1,6 +1,6 @@
 const { default: mongoose } = require('mongoose')
 
-const channelSchema = new mongoose.Schema({
+const groupSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -21,15 +21,15 @@ const channelSchema = new mongoose.Schema({
   }
 })
 
-channelSchema.pre('save', function (next) {
+groupSchema.pre('save', function (next) {
   this.updatedAt = Date.now()
   next()
 })
 
-channelSchema.pre('findOneAndUpdate', function (next) {
+groupSchema.pre('findOneAndUpdate', function (next) {
   this.set({ updatedAt: Date.now() })
   next()
 })
 
-const Channel = mongoose.model('Channels', channelSchema)
-module.exports = Channel
+const Group = mongoose.model('Groups', groupSchema)
+module.exports = Group

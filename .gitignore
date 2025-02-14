@@ -4,9 +4,6 @@
 node_modules/
 npm-debug.log
 
-
-.env
-
 # Các file build
 build/
 dist/
