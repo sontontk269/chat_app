@@ -1,0 +1,22 @@
+
+
+# Node.js
+node_modules/
+npm-debug.log
+
+
+.env
+
+# Các file build
+build/
+dist/
+
+
+# Các thư mục và file trong back-end
+node_modules/
+.env
+logs/
+dist/
+
+
+*.log
