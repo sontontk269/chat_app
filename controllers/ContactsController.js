@@ -7,20 +7,13 @@ const searchContacts = async (req, res, next) => {
   try {
     const { searchTerm } = req.body
 
-    if (searchTerm === undefined || searchTerm === null)
-      return res.status(400).send('searchTerm is required.')
+    if (searchTerm === undefined || searchTerm === null) return res.status(400).send('searchTerm is required.')
 
-    const sanitizedSearchTerm = searchTerm.replace(
-      /[.*+?^${}()|[\]\\]/g,
-      '\\$&'
-    )
+    const sanitizedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const regex = new RegExp(sanitizedSearchTerm, 'i')
 
     const contacts = await User.find({
-      $and: [
-        { _id: { $ne: req.userId } },
-        { $or: [{ firstName: regex }, { lastName: regex }, { email: regex }] }
-      ]
+      $and: [{ _id: { $ne: req.userId } }, { $or: [{ firstName: regex }, { lastName: regex }, { email: regex }] }]
     })
 
     return res.status(200).json({ contacts })
@@ -50,7 +43,7 @@ const getContactForDMList = async (req, res, next) => {
             $cond: {
               if: { $eq: ['$sender', userId] },
               then: '$recipient',
-              else: 'sender'
+              else: '$sender'
             }
           },
           lastMessageTime: { $first: '$timestamp' }
@@ -95,10 +88,7 @@ const getContactForDMList = async (req, res, next) => {
 const getAllContacts = async (req, res, next) => {
   try {
     const { userId } = req
-    const users = await User.find(
-      { _id: { $ne: userId } },
-      'firstName lastName _id email'
-    )
+    const users = await User.find({ _id: { $ne: userId } }, 'firstName lastName _id email')
     const contacts = users.map((user) => ({
       label: user.firstName ? `${user.firstName} ${user.lastName}` : user.email,
       value: user._id

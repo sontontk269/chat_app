@@ -33,6 +33,8 @@ const MesssagesModel = new mongoose.Schema({
       return this.messageType === 'file'
     }
   },
+
+  isSeen: { type: Boolean, default: false },
   timestamp: {
     type: Date,
     default: Date.now

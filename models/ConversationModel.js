@@ -8,7 +8,6 @@ const ConversationModel = new mongoose.Schema({
     required: false,
     default: null
   },
-  isSeen: { type: Boolean, default: false },
   updatedAt: {
     type: Date,
     default: Date.now()

@@ -29,11 +29,10 @@ const setupSocket = (server) => {
     const conversation = await Conversation.findById(conversationId)
     if (!conversation) return
     if (!conversation.members.includes(recipient)) return
-    await Notification.updateOne(
-      { _id: conversationId, recipient },
-      { $set: { isRead: true } }
+    await Message.updateMany(
+      { conversationId, isSeen: false, sender: { $ne: recipient } },
+      { $addToSet: { seenBy: recipient }, $set: { isSeen: true } }
     )
-
     io.emit('messageSeen', { conversationId, recipient })
   }
 
@@ -51,7 +50,7 @@ const setupSocket = (server) => {
 
     await Conversation.findOneAndUpdate(
       { members: { $all: [message.sender, message.recipient] } },
-      { lastMessage: createdMessage._id, isSeen: false, timestamp: new Date() },
+      { lastMessage: createdMessage._id, timestamp: new Date() },
       { new: true, upsert: true }
     )
 
@@ -74,9 +73,7 @@ const setupSocket = (server) => {
       fileUrl
     })
 
-    const messageData = await Message.findById(createdMessage._id)
-      .populate('sender', 'id email firstName lastName image color')
-      .exec()
+    const messageData = await Message.findById(createdMessage._id).populate('sender', 'id email firstName lastName image color').exec()
 
     await Channel.findByIdAndUpdate(channelId, {
       $push: { messages: createdMessage._id }
@@ -100,8 +97,7 @@ const setupSocket = (server) => {
 
   io.on('connection', (socket) => {
     const userId = socket.handshake.query.userId
-    if (!userId)
-      return console.log('User ID is not provided during connection.')
+    if (!userId) return console.log('User ID is not provided during connection.')
     userSocketMap.set(userId, socket.id)
     console.log(`User connected: ${userId} with socket ID: ${socket.id}`)
 
